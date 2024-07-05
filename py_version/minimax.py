@@ -95,30 +95,30 @@ def empty_cells(state):
     for x, row in enumerate(state):
         for y, cell in enumerate(row):
             if cell == 0:
-                cells.append([x, y])
+                cells.append((x, y))
 
     return cells
 
 
-def valid_move(x, y):
+def valid_move(move):
     """
     A move is valid if the chosen cell is empty
     :param x: X coordinate
     :param y: Y coordinate
     :return: True if the board[x][y] is empty
     """
-    return [x, y] in empty_cells(board)
+    return move in empty_cells(board)
 
 
-def set_move(x, y, player):
+def set_move(move, player):
     """
     Set the move on board, if the coordinates are valid
     :param x: X coordinate
     :param y: Y coordinate
     :param player: the current player
     """
-    if valid_move(x, y):
-        board[x][y] = player
+    if valid_move(move):
+        board[move[0]][move[1]] = player
         return True
     else:
         return False
@@ -134,33 +134,28 @@ def minimax(state, depth, player):
     :param player: an human or a computer
     :return: a list with [the best row, best col, best score]
     """
-    best_x = None
-    best_y = None
+    best_move = None
     best_score = -infinity if player == COMP else +infinity
-
 
     if depth == 0 or game_over(state):
         score = evaluate(state)
-        return (None, None, score)
+        return None, score
 
-    for cell in empty_cells(state):
-        x, y = cell[0], cell[1]
-        state[cell[0]][cell[1]] = player
-        _, _, new_score = minimax(state, depth - 1, -player)
-        state[x][y] = 0
+    for move in empty_cells(state):
+        state[move[0]][move[1]] = player
+        _, new_score = minimax(state, depth - 1, -player)
+        state[move[0]][move[1]] = 0
 
         if player == COMP:
             if new_score > best_score:
-                best_x = x
-                best_y = y
+                best_move = move
                 best_score = new_score  # max value
         else:
             if new_score < best_score:
-                best_x = x
-                best_y = y
+                best_move = move
                 best_score = new_score  # max value
 
-    return (best_x, best_y, depth_penalty*best_score)
+    return best_move, depth_penalty*best_score
 
 
 def clean():
@@ -216,9 +211,8 @@ def ai_turn(c_choice, h_choice):
         y = choice([0, 1, 2])
     else:
         move = minimax(board, depth, COMP)
-        x, y = move[0], move[1]
 
-    set_move(x, y, COMP)
+    set_move(move, COMP)
     time.sleep(1)
 
 
@@ -234,7 +228,7 @@ def human_turn(c_choice, h_choice):
         return
 
     # Dictionary of valid moves
-    move = -1
+    choice = -1
     moves = {
         1: [0, 0], 2: [0, 1], 3: [0, 2],
         4: [1, 0], 5: [1, 1], 6: [1, 2],
@@ -245,11 +239,11 @@ def human_turn(c_choice, h_choice):
     print(f'Human turn [{h_choice}]')
     render(board, c_choice, h_choice)
 
-    while move < 1 or move > 9:
+    while choice < 1 or choice > 9:
         try:
-            move = int(input('Use numpad (1..9): '))
-            coord = moves[move]
-            can_move = set_move(coord[0], coord[1], HUMAN)
+            choice = int(input('Use numpad (1..9): '))
+            move = moves[choice]
+            can_move = set_move(move, HUMAN)
 
             if not can_move:
                 print('Bad move')

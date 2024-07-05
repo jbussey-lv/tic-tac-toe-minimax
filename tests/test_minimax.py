@@ -21,9 +21,9 @@ next_move_inputs = [
 def test_gets_right_next_move(state, expected_move):
     depth = 9
     COMP = +1
-    [x, y, _] = minimax(state, depth, COMP)
+    move, _ = minimax(state, depth, COMP)
     
-    assert (x, y) == expected_move
+    assert move == expected_move
 
 def count_zeros(state):
     count = 0
