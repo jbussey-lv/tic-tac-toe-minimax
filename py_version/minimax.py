@@ -124,7 +124,7 @@ def set_move(move, player):
         return False
 
 
-def minimax(state, depth, player):
+def minimax(state, depth, player, alpha=-infinity, beta=infinity):
     depth_penalty = 0.95
     """
     AI function that choice the best move
@@ -143,17 +143,24 @@ def minimax(state, depth, player):
 
     for move in empty_cells(state):
         state[move[0]][move[1]] = player
-        _, new_score = minimax(state, depth - 1, -player)
+        _, new_score = minimax(state, depth - 1, -player, alpha, beta)
         state[move[0]][move[1]] = 0
 
         if player == COMP:
+            if new_score > alpha:
+                alpha = new_score
             if new_score > best_score:
                 best_move = move
                 best_score = new_score  # max value
         else:
+            if new_score < beta:
+                beta = new_score
             if new_score < best_score:
                 best_move = move
                 best_score = new_score  # max value
+
+        if alpha >= beta:
+            break
 
     return best_move, depth_penalty*best_score
 
@@ -209,8 +216,9 @@ def ai_turn(c_choice, h_choice):
     if depth == 9:
         x = choice([0, 1, 2])
         y = choice([0, 1, 2])
+        move = (x, y)
     else:
-        move = minimax(board, depth, COMP)
+        move, _ = minimax(board, depth, COMP)
 
     set_move(move, COMP)
     time.sleep(1)
@@ -230,9 +238,9 @@ def human_turn(c_choice, h_choice):
     # Dictionary of valid moves
     choice = -1
     moves = {
-        1: [0, 0], 2: [0, 1], 3: [0, 2],
-        4: [1, 0], 5: [1, 1], 6: [1, 2],
-        7: [2, 0], 8: [2, 1], 9: [2, 2],
+        1: (0, 0), 2: (0, 1), 3: (0, 2),
+        4: (1, 0), 5: (1, 1), 6: (1, 2),
+        7: (2, 0), 8: (2, 1), 9: (2, 2),
     }
 
     clean()
