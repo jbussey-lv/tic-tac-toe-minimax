@@ -15,12 +15,12 @@ Year: 2017
 License: GNU GENERAL PUBLIC LICENSE (GPL)
 """
 
-HUMAN = -1
-COMP = +1
+HUMAN = 0
+COMP = 1
 board = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0],
+    [None, None, None],
+    [None, None, None],
+    [None, None, None]
 ]
 
 lines: List[List[Tuple[int, ...]]] = [
@@ -85,7 +85,7 @@ def board_full(state):
     :param state: the state of the current board
     :return: True if the board is full
     """
-    return all(cell != 0 for row in state for cell in row)
+    return all(cell is not None for row in state for cell in row)
 
 def empty_cells(state):
     """
@@ -97,7 +97,7 @@ def empty_cells(state):
 
     for x, row in enumerate(state):
         for y, cell in enumerate(row):
-            if cell == 0:
+            if cell is None:
                 cells.append((x, y))
 
     return cells
@@ -147,8 +147,9 @@ def minimax(state, depth, player, alpha=-infinity, beta=infinity):
 
     for move in empty_cells(state):
         state[move[0]][move[1]] = player
-        _, new_score, new_scores = minimax(state, depth - 1, -player, alpha, beta)
-        state[move[0]][move[1]] = 0
+        next_player = (player + 1) % 2
+        _, new_score, new_scores = minimax(state, depth - 1, next_player, alpha, beta)
+        state[move[0]][move[1]] = None
 
         if player == COMP:
             if new_score > alpha:
@@ -225,7 +226,7 @@ def ai_turn(c_choice, h_choice):
         y = choice([0, 1, 2])
         move = (x, y)
     else:
-        move, _ = minimax(board, depth, COMP)
+        move, _, _ = minimax(board, depth, COMP)
 
     set_move(move, COMP)
     time.sleep(1)

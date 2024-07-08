@@ -13,9 +13,9 @@ from py_version.minimax import minimax
 
 
 next_move_inputs = [
-    [[[ 1,-1,0],[-1,0,0],[0,0,0]], (1,1)],
-    [[[ 1,-1,0],[0,-1,0],[0,0,0]], (2,1)],
-    [[[ 1,-1,-1],[0,1,0],[0,0,0]], (2,2)],
+    [[[ 1,0,None],[0,None,None],[None,None,None]], (1,1)],
+    [[[ 1,0,None],[None,0,None],[None,None,None]], (2,1)],
+    [[[ 1,0,0],[None,1,None],[None,None,None]], (2,2)],
 ]
 @pytest.mark.parametrize("state,expected_move", next_move_inputs)
 def test_gets_right_next_move(state, expected_move):
@@ -24,11 +24,3 @@ def test_gets_right_next_move(state, expected_move):
     move, _, _ = minimax(state, depth, COMP)
     
     assert move == expected_move
-
-def count_zeros(state):
-    count = 0
-    for row in state:
-        for cell in row:
-            if cell == 0:
-                count += 1
-    return count
