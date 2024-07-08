@@ -21,7 +21,7 @@ next_move_inputs = [
 def test_gets_right_next_move(state, expected_move):
     depth = 9
     COMP = +1
-    move, _ = minimax(state, depth, COMP)
+    move, _, _ = minimax(state, depth, COMP)
     
     assert move == expected_move
 

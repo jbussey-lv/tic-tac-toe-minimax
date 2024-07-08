@@ -41,14 +41,17 @@ def evaluate(state):
     :param state: the state of the current board
     :return: +1 if the computer wins; -1 if the human wins; 0 draw
     """
+    scores = [0, 0]
     if wins(state, COMP):
+        scores[0] = 1
         score = +1
     elif wins(state, HUMAN):
+        scores[1] = 1
         score = -1
     else:
         score = 0
 
-    return score
+    return score, scores
 
 
 def wins(state, player):
@@ -136,14 +139,15 @@ def minimax(state, depth, player, alpha=-infinity, beta=infinity):
     """
     best_move = None
     best_score = -infinity if player == COMP else +infinity
+    best_scores = [0, 0]
 
     if depth == 0 or game_over(state):
-        score = evaluate(state)
-        return None, score
+        score, scores = evaluate(state)
+        return None, score, scores
 
     for move in empty_cells(state):
         state[move[0]][move[1]] = player
-        _, new_score = minimax(state, depth - 1, -player, alpha, beta)
+        _, new_score, new_scores = minimax(state, depth - 1, -player, alpha, beta)
         state[move[0]][move[1]] = 0
 
         if player == COMP:
@@ -152,17 +156,20 @@ def minimax(state, depth, player, alpha=-infinity, beta=infinity):
             if new_score > best_score:
                 best_move = move
                 best_score = new_score  # max value
+                best_scores = new_scores
+
         else:
             if new_score < beta:
                 beta = new_score
             if new_score < best_score:
                 best_move = move
                 best_score = new_score  # max value
+                best_scores = new_scores
 
         if alpha >= beta:
             break
 
-    return best_move, depth_penalty*best_score
+    return best_move, depth_penalty*best_score, best_scores
 
 
 def clean():
